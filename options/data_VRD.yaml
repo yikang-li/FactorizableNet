@@ -1,0 +1,7 @@
+dir: data/VRD
+train:
+    SCALES: [450, 500, 550, 600, 600, 650, 700, 750]# more probability to 600
+    MAX_SIZE: 1000
+test:
+    SCALES: [600,]
+    MAX_SIZE: 1000

@@ -1,0 +1,29 @@
+# Training Settings
+
+kmeans_anchors: True
+anchor_dir: data/svg # set
+
+object:
+      train:
+            num_box_pre_NMS: 12000
+            num_box_post_NMS: 2000
+            nms_thres: 0.7
+            min_size: 16
+            dropout_box_runoff_image: False
+            allowed_border: 128
+            clobber_positives: False
+            negative_overlap: 0.3
+            positive_overlap: 0.7
+            dontcare_area_intersection_hi: 0.5
+            fg_fraction: 0.5
+            batch_size: 512
+            BBOX_INSIDE_WEIGHTS: [1.0, 1.0, 1.0, 1.0]
+            POSITIVE_WEIGHT: -1.0
+      test:
+            num_box_pre_NMS: 12000
+            num_box_post_NMS: 300
+            nms_thres: 0.6
+            min_size: 16
+            dropout_box_runoff_image: False
+            allowed_border: 128
+

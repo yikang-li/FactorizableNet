@@ -1,0 +1,43 @@
+logs:
+    dir_logs: output/
+    model_name: FN_VRD
+data:
+    dataset: VRD
+    opts: options/data_VRD.yaml
+    use_region: false
+    batch_size: 1
+model:
+    arch: FN_v4s
+    rpn_opts: options/RPN/RPN_FN_VRD.yaml
+    # feature vector size
+    dim_hr: 512
+    dim_ho: 512
+    dim_hp: 512
+    pool_size: 5
+    op: Sum
+    # for both kernel-based attention and Mutan
+    dim_mm: 256
+    activation: relu
+    # Iters for message passing, 0 means disable that
+    MPS_iter: 1
+    # settings for attention gate
+    use_bias: True
+    dropout: 0.
+    # Settings for inference part
+    fusion: PI_v5 # PI is short for [Predicate Inference]
+    bottleneck: True
+    # loss_weight
+    cls_obj: 1.
+    cls_pred: 2.
+    reg_obj: 0.5
+
+optim:
+    lr: 0.01
+    lr_decay: 0.1
+    lr_decay_epoch: 3
+    epochs: 15
+    optimizer: 0 # [0: SGD | 1: Adam | 2: Adagrad]
+    nesterov: True
+    weight_decay: 0.00001
+    momentum: 0.9
+    clip_gradient: True

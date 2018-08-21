@@ -7,6 +7,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Guide for Model Evaluation with pretrained model
 - [x] Guide for Model Training
 - [x] Uploading pretrained model and format-compatible datasets.
+- [ ] Update the Model link for VG-DR-Net (We will upload a new model by Aug. 27). 
 - [ ] A demonstration of our Factorizable Net 
 
 
@@ -128,19 +129,25 @@ We thank [longcw](https://github.com/longcw/faster_rcnn_pytorch) for his generou
 ## Reference
 
 If you find our project helpful, your citations are highly appreciated:
+@inproceedings{li2017vip,  
+	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Wang, Kun and Wang, Xiaogang},  
+	title={ViP-CNN: Visual Phrase Guided Convolutional Neural Network},  
+	booktitle = {CVPR},  
+	year      = {2017}  
+}
 
 @inproceedings{li2017msdn,  
 	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Wang, Kun and Wang, Xiaogang},  
 	title={Scene graph generation from objects, phrases and region captions},  
-	booktitle = {Proceedings of the IEEE International Conference on Computer Vision},  
+	booktitle = {ICCV},  
 	year      = {2017}  
 }
 
 @inproceedings{li2018fnet,  
-	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Jianping, Shi and Chao, Zhang and Wang, Xiaogang},  
-	title={Scene graph generation from objects, phrases and region captions},  
-	booktitle = {Proceedings of the IEEE International Conference on Computer Vision},  
-	year      = {2017}  
+	author={Li, Yikang and Ouyang, Wanli and Bolei, Zhou and Jianping, Shi and Chao, Zhang and Wang, Xiaogang},  
+	title={Factorizable Net: An Efficient Subgraph-based Framework for Scene Graph Generation},  
+	booktitle = {ECCV},  
+	year      = {2018}  
 }
 
 

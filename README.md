@@ -7,7 +7,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Guide for Model Evaluation with pretrained model
 - [x] Guide for Model Training
 - [x] Uploading pretrained model and format-compatible datasets.
-- [ ] Update the Model link for VG-DR-Net (We will upload a new model by Aug. 27). 
+- [x] Update the Model link for VG-DR-Net (We will upload a new model by Aug. 27). 
 - [ ] A demonstration of our Factorizable Net 
 
 
@@ -39,7 +39,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 7. Link the image data folder to 	target folder: ```ln -s /path/to/images F-Net/data/${Dataset}/images```
 	- p.s. You can change the default data directory by modifying ```dir``` in ```options/data_xxx.json```.
 8. [optional] Download the pretrained RPN for [Visual Genome](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) and [VRD](https://drive.google.com/open?id=1OdzZKn5ZBIXFdxeOjCvjqNhFjobWnDS9). Place them into ```output/```.
-4. [optional] Download the pretrained Factorizable Net on [VG-MSDN](https://drive.google.com/open?id=1W7PYyYvkROzC_GZwrgF0XS4fH6r2NyyV), [VG-DR-Net](https://drive.google.com/open?id=1ROWPoMC7A2a-j0v5YqPbpRWQdaNcaRuF) and [VG-VRD](https://drive.google.com/open?id=1n-8d4K7-PywVwuA90x50nnIW1TKyKHU4), and place them to ```output/trained_models/```
+4. [optional] Download the pretrained Factorizable Net on [VG-MSDN](https://drive.google.com/open?id=1W7PYyYvkROzC_GZwrgF0XS4fH6r2NyyV), [VG-DR-Net](https://drive.google.com/open?id=1b-RoEeRWju1Mz4EESaagXOIWpUriBm_D) and [VG-VRD](https://drive.google.com/open?id=1n-8d4K7-PywVwuA90x50nnIW1TKyKHU4), and place them to ```output/trained_models/```
 
 ## Project Organization
 There are several subfolders contained:
@@ -51,7 +51,7 @@ There are several subfolders contained:
 - ```output```: storing the trained model, checkpoints and loggers.
 
 ## Evaluation with our Pretrained Models
-Pretrained models on [VG-MSDN](https://drive.google.com/open?id=1iKgYVLTUHi_VpmWrQJ6o1OMj3aGlrmDC), [VG-DR-Net](https://drive.google.com/open?id=1ROWPoMC7A2a-j0v5YqPbpRWQdaNcaRuF) and [VG-VRD](https://drive.google.com/open?id=1n-8d4K7-PywVwuA90x50nnIW1TKyKHU4) are provided. ```--evaluate``` is provided to enable evaluation mode. Additionally, we also provide ```--use_gt_boxes``` to fed the ground-truth object bounding boxes instead of RPN proposals. 
+Pretrained models on [VG-MSDN](https://drive.google.com/open?id=1iKgYVLTUHi_VpmWrQJ6o1OMj3aGlrmDC), [VG-DR-Net](https://drive.google.com/open?id=1b-RoEeRWju1Mz4EESaagXOIWpUriBm_D) and [VG-VRD](https://drive.google.com/open?id=1n-8d4K7-PywVwuA90x50nnIW1TKyKHU4) are provided. ```--evaluate``` is provided to enable evaluation mode. Additionally, we also provide ```--use_gt_boxes``` to fed the ground-truth object bounding boxes instead of RPN proposals. 
 
 - Evaluation on **VG-MSDN** with pretrained.
 Scene Graph Generation results:  Recall@50: ```12.984%```, Recall@100: ```16.506%```.
@@ -73,7 +73,7 @@ CUDA_VISIBLE_DEVICES=0 python train_FN.py --evaluate \
 ```
 
 - Evaluation on **VG-DR-Net** with pretrained.
-Scene Graph Generation results:  Recall@50: ```12.984%```, Recall@100: ```16.506%```.
+Scene Graph Generation results:  Recall@50: ```19.807%```, Recall@100: ```25.488%```.
 
 ```
 CUDA_VISIBLE_DEVICES=0 python train_FN.py --evaluate --dataset_option=normal \

@@ -20,6 +20,7 @@ model:
     activation: relu
     # Iters for message passing, 0 means disable that
     MPS_iter: 1
+    geometry: Geometry_Transform_v1
     # settings for attention gate
     use_bias: True
     dropout: 0.

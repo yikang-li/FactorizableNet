@@ -8,6 +8,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Guide for Model Training
 - [x] Uploading pretrained model and format-compatible datasets.
 - [x] Update the Model link for VG-DR-Net (We will upload a new model by Aug. 27). 
+- [x] Update the Dataset link for VG-DR-Net. 
 - [ ] A demonstration of our Factorizable Net 
 
 
@@ -33,7 +34,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
     ./make.sh
     cd ..
     ```
-5. Download the three datasets [**VG-MSDN**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VG-DR-Net**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VRD**](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) to ```F-Net/data```. And extract the folders with ```tar xzvf ${Dataset}.tgz```. We have convert to original annotations to ```json``` version. 
+5. Download the three datasets [**VG-MSDN**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VG-DR-Net**](https://drive.google.com/open?id=1JZecHzzwGj1hxnn77hPOlOvqpjavebcD), [**VRD**](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) to ```F-Net/data```. And extract the folders with ```tar xzvf ${Dataset}.tgz```. We have convert to original annotations to ```json``` version. 
 
 6. Download [**Visual Genome images**](http://visualgenome.org/api/v0/api_home.html) and [**VRD**](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip) images. 
 7. Link the image data folder to 	target folder: ```ln -s /path/to/images F-Net/data/${Dataset}/images```
@@ -59,7 +60,7 @@ Scene Graph Generation results:  Recall@50: ```12.984%```, Recall@100: ```16.506
 ```
 CUDA_VISIBLE_DEVICES=0 python train_FN.py --evaluate --dataset_option=normal \
 	--path_opt options/models/VG-MSDN.yaml \
-	--pretrained_model output/trained_models/Model-VG-MDSN.h5
+	--pretrained_model output/trained_models/Model-VG-MSDN.h5
 ```
 
 

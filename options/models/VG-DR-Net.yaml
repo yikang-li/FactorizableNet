@@ -13,20 +13,18 @@ model:
     dim_hr: 512
     dim_ho: 512
     dim_hp: 512
-    pool_size: 7
+    pool_size: 5
     op: Sum
     # for both kernel-based attention and Mutan
     dim_mm: 256
     activation: relu
     # Iters for message passing, 0 means disable that
     MPS_iter: 1
-    geometry: Geometry_Transform_v1
     # settings for attention gate
     use_bias: True
     dropout: 0.
     # Settings for inference part
     fusion: PI_v5 # PI is short for [Predicate Inference]
-    bottleneck: True
     # loss_weight
     cls_obj: 1.
     cls_pred: 2.

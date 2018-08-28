@@ -11,6 +11,8 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Update the Dataset link for VG-DR-Net. 
 - [ ] A demonstration of our Factorizable Net 
 
+## Updates
+- Aug 28: Bug fix for running the evaluation with "--use_gt_boxes". VG-DR-Net has some self-relations, e.g. A-relation-A. Previously, we assumed there is no such relation. This commit may influence the model performance on Scene Graph Generation. 
 
 ## Project Settings
 

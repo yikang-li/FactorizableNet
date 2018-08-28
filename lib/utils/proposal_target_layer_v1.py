@@ -259,16 +259,19 @@ def _generate_pairs(ids, sub_assignment_select = None, obj_assignment_select = N
     id_i, id_j = np.meshgrid(ids, ids, indexing='ij') # Grouping the input object rois
     id_i = id_i.reshape(-1)
     id_j = id_j.reshape(-1)
-    # remove the diagonal items
-    id_num = len(ids)
-    diagonal_items = np.array(range(id_num))
-    diagonal_items = diagonal_items * id_num + diagonal_items
-    all_id = range(len(id_i))
-    selected_id = np.setdiff1d(all_id, diagonal_items)
-    id_i = id_i[selected_id]
-    id_j = id_j[selected_id]
+    # removing diagonal items
+    # VG-DR-Net has self-relations: e.g. A-relation-A, so we comment these codes
+    # id_num = len(ids)
+    # diagonal_items = np.array(range(id_num))
+    # diagonal_items = diagonal_items * id_num + diagonal_items
+    # all_id = range(len(id_i))
+    # selected_id = np.setdiff1d(all_id, diagonal_items)
+    # id_i = id_i[selected_id]
+    # id_j = id_j[selected_id]
     if sub_assignment_select is not None and obj_assignment_select is not None:
-        rel_assignment = sub_assignment_select * (len(ids) - 1) + obj_assignment_select - (obj_assignment_select > sub_assignment_select).astype(np.int)
+        # For diagnoal-items-removed
+        # rel_assignment = sub_assignment_select * (len(ids) - 1) + obj_assignment_select - (obj_assignment_select > sub_assignment_select).astype(np.int)
+        rel_assignment = sub_assignment_select * len(ids) + obj_assignment_select
     else:
         rel_assignment = range(len(id_i))
 

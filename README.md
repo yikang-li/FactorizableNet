@@ -130,12 +130,15 @@ We thank [longcw](https://github.com/longcw/faster_rcnn_pytorch) for his generou
 ## Reference
 
 If you find our project helpful, your citations are highly appreciated:
-@inproceedings{li2017vip,  
-	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Wang, Kun and Wang, Xiaogang},  
-	title={ViP-CNN: Visual Phrase Guided Convolutional Neural Network},  
-	booktitle = {CVPR},  
-	year      = {2017}  
+
+@inproceedings{li2018fnet,  
+	author={Li, Yikang and Ouyang, Wanli and Bolei, Zhou and Jianping, Shi and Chao, Zhang and Wang, Xiaogang},  
+	title={Factorizable Net: An Efficient Subgraph-based Framework for Scene Graph Generation},  
+	booktitle = {ECCV},  
+	year      = {2018}  
 }
+
+We also have two papers regarding to scene graph generation / visual relationship detection:
 
 @inproceedings{li2017msdn,  
 	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Wang, Kun and Wang, Xiaogang},  
@@ -144,11 +147,11 @@ If you find our project helpful, your citations are highly appreciated:
 	year      = {2017}  
 }
 
-@inproceedings{li2018fnet,  
-	author={Li, Yikang and Ouyang, Wanli and Bolei, Zhou and Jianping, Shi and Chao, Zhang and Wang, Xiaogang},  
-	title={Factorizable Net: An Efficient Subgraph-based Framework for Scene Graph Generation},  
-	booktitle = {ECCV},  
-	year      = {2018}  
+@inproceedings{li2017vip,  
+	author={Li, Yikang and Ouyang, Wanli and Zhou, Bolei and Wang, Kun and Wang, Xiaogang},  
+	title={ViP-CNN: Visual Phrase Guided Convolutional Neural Network},  
+	booktitle = {CVPR},  
+	year      = {2017}  
 }
 
 

@@ -11,7 +11,6 @@ from lib.utils.timer import Timer
 from lib.utils.metrics import check_recall
 from lib.network import np_to_variable
 
-import lib.roi_data_layer.roidb as rdl_roidb
 from lib.datasets.VRD_loader import VRD
 import argparse
 from models.RPN import utils as RPN_utils

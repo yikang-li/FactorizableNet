@@ -11,7 +11,6 @@ from lib.utils.timer import Timer
 from lib.utils.metrics import check_recall
 from lib.network import np_to_variable
 
-import lib.roi_data_layer.roidb as rdl_roidb
 from lib.datasets.visual_genome_loader import visual_genome
 import argparse
 from models.RPN import utils as RPN_utils

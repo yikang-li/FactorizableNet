@@ -12,8 +12,8 @@ object:
             dropout_box_runoff_image: False
             allowed_border: 128
             clobber_positives: False
-            negative_overlap: 0.3
-            positive_overlap: 0.7
+            negative_overlap: 0.35
+            positive_overlap: 0.5
             dontcare_area_intersection_hi: 0.5
             fg_fraction: 0.5
             batch_size: 512

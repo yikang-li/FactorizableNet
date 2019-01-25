@@ -20,7 +20,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 1. Install the requirements (you can use pip or [Anaconda](https://www.continuum.io/downloads)):
 
     ```
-    conda install pip pyyaml sympy h5py cython numpy scipy
+    conda install pip pyyaml sympy h5py cython numpy scipy click
     conda install -c menpo opencv3
     conda install -c soumith pytorch torchvision cuda80 
     pip install easydict
@@ -37,7 +37,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
     ./make.sh
     cd ..
     ```
-5. Download the three datasets [**VG-MSDN**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VG-DR-Net**](https://drive.google.com/open?id=1JZecHzzwGj1hxnn77hPOlOvqpjavebcD), [**VRD**](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) to ```F-Net/data```. And extract the folders with ```tar xzvf ${Dataset}.tgz```. We have convert to original annotations to ```json``` version. 
+5. Download the three datasets [**VG-MSDN**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VG-DR-Net**](https://drive.google.com/open?id=1JZecHzzwGj1hxnn77hPOlOvqpjavebcD), [**VRD**](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) to ```F-Net/data```. And extract the folders with ```tar xzvf ${Dataset}.tgz```. We have converted the original annotations to ```json``` version. 
 
 6. Download [**Visual Genome images**](http://visualgenome.org/api/v0/api_home.html) and [**VRD**](http://imagenet.stanford.edu/internal/jcjohns/scene_graphs/sg_dataset.zip) images. 
 7. Link the image data folder to 	target folder: ```ln -s /path/to/images F-Net/data/${Dataset}/images```
@@ -50,7 +50,7 @@ There are several subfolders contained:
 
 - ```lib```: dataset Loader, NMS, ROI-Pooling, evaluation metrics, etc. are listed in the folder.
 - ```options```: configurations for ```Data```, ```RPN```, ```F-Net``` and ```hyperparameters```.
-- ```models```: model definations for ```RPN```, ```Factorizable``` and related modules.
+- ```models```: model definitions for ```RPN```, ```Factorizable``` and related modules.
 - ```data```: containing VG-DR-Net (```svg/```), VG-MSDN (```visual_genome/```) and VRD (```VRD/```).
 - ```output```: storing the trained model, checkpoints and loggers.
 
@@ -115,7 +115,7 @@ CUDA_VISIBLE_DEVICES=0 python train_FN.py --evaluate --dataset_option=normal \
 	
 	```
 	
-	```--rpn xxx.h5``` can be ignore for end-to-end training from pretrained **VGG16**. Sometime, unexpected and confusing errors appear. *Ignore it and restart to training.*
+	```--rpn xxx.h5``` can be ignored in end-to-end training from pretrained **VGG16**. Sometime, unexpected and confusing errors appear. *Ignore it and restart to training.*
 	
 - For better results, we usually re-train the model with additional epochs by resuming the training from the checkpoint with ```--resume ckpt```:
 

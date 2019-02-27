@@ -147,15 +147,7 @@ def proposal_layer(rpn_cls_prob_reshape, rpn_bbox_pred, im_infos,
 
 def _filter_boxes(boxes, min_size):
     """Remove all boxes with any side smaller than min_size."""
-    if boxes.shape[0] == 0:
-        pdb.set_trace()
-
     ws = boxes[:, 2] - boxes[:, 0] + 1
     hs = boxes[:, 3] - boxes[:, 1] + 1
     keep = np.where((ws >= min_size) & (hs >= min_size))[0]
-    if len(keep) == 0:
-        print('No boxes remain. Halve the [min_size]')
-        min_size = min_size // 2
-        keep = np.where((ws >= min_size) & (hs >= min_size))[0]
-        pdb.set_trace()
     return keep

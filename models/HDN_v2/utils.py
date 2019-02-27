@@ -163,7 +163,7 @@ def build_loss_cls(cls_score, labels, loss_weight=None):
         cross_entropy = F.cross_entropy(cls_score, labels, weight=loss_weight)
         maxv, predict = cls_score.data.max(1)
         if fg_cnt == 0:
-            tp = 0
+            tp = torch.zeros_like(fg_cnt)
         else:
             tp = torch.sum(predict[:fg_cnt].eq(labels.data[:fg_cnt]))
         tf = torch.sum(predict[fg_cnt:].eq(labels.data[fg_cnt:]))

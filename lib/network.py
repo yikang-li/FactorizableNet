@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import numpy as np
 import math
 import pdb
@@ -94,7 +93,7 @@ def load_net(fname, net):
 
 
 def np_to_variable(x, is_cuda=True, dtype=torch.FloatTensor):
-    return Variable(np_to_tensor(x, is_cuda, dtype))
+    return np_to_tensor(x, is_cuda, dtype)
 
 def np_to_tensor(x, is_cuda=True, dtype=torch.FloatTensor):
     v = torch.from_numpy(x).type(dtype)
@@ -159,7 +158,7 @@ def clip_gradient(model, clip_norm):
         if p.requires_grad and p.grad is not None:
             modulenorm = p.grad.data.norm()
             totalnorm += modulenorm ** 2
-    totalnorm = np.sqrt(totalnorm)
+    totalnorm = torch.sqrt(totalnorm)
 
     norm = clip_norm / max(totalnorm, clip_norm)
     for p in model.parameters():

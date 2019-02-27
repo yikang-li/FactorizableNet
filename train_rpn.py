@@ -15,8 +15,6 @@ from lib.datasets.visual_genome_loader import visual_genome
 import argparse
 from models.RPN import utils as RPN_utils
 
-from torch.autograd import Variable
-
 import pdb
 
 parser = argparse.ArgumentParser('Options for training RPN in pytorch')
@@ -138,14 +136,14 @@ def train(train_loader, target_net, optimizer, epoch):
 
         # measure the data loading time
         data_time.update(time.time() - end)
-        im_data = Variable(sample['visual'].cuda())
+        im_data = sample['visual'][0].cuda()
         im_info = sample['image_info']
         gt_objects = sample['objects']
         anchor_targets = [
-                np_to_variable(sample['rpn_targets']['object'][0],is_cuda=True, dtype=torch.LongTensor),
-                np_to_variable(sample['rpn_targets']['object'][1],is_cuda=True),
-                np_to_variable(sample['rpn_targets']['object'][2],is_cuda=True),
-                np_to_variable(sample['rpn_targets']['object'][3],is_cuda=True)
+                np_to_variable(sample['rpn_targets']['object'][0][0],is_cuda=True, dtype=torch.LongTensor),
+                np_to_variable(sample['rpn_targets']['object'][0][1],is_cuda=True),
+                np_to_variable(sample['rpn_targets']['object'][0][2],is_cuda=True),
+                np_to_variable(sample['rpn_targets']['object'][0][3],is_cuda=True)
                 ]
         # Forward pass
         target_net(im_data, im_info, rpn_data=anchor_targets)

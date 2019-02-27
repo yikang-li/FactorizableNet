@@ -24,6 +24,8 @@ import lib.utils.logger as logger
 import models
 from models.HDN_v2.utils import save_checkpoint, load_checkpoint, save_results, save_detections
 
+from models.modules.dataParallel import DataParallel
+
 
 import pdb
 
@@ -38,7 +40,6 @@ parser.add_argument('--path_opt', default='options/FN_v4/map_v2.yaml', type=str,
 parser.add_argument('--dir_logs', type=str, help='dir logs')
 parser.add_argument('--model_name', type=str, help='model name prefix')
 parser.add_argument('--dataset_option', type=str, help='data split selection [small | fat | normal]')
-parser.add_argument('--batch_size', type=int, help='#images per batch')
 parser.add_argument('--workers', type=int, default=4, help='#idataloader workers')
 
 # Training parameters
@@ -71,6 +72,8 @@ parser.add_argument('--save_all_from', type=int,
                          ''' then keep all (useful to save disk space)')''')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation and test set')
+parser.add_argument('--evaluate_object', dest='evaluate_object', action='store_true',
+                    help='Evaluate model with object detection')
 parser.add_argument('--use_normal_anchors', action='store_true', help='Whether to use kmeans anchors')
 
 
@@ -110,11 +113,10 @@ def main():
         },
         'data':{
             'dataset_option': args.dataset_option,
-            'batch_size': args.batch_size,
+            'batch_size': torch.cuda.device_count(),
         },
         'optim': {
             'lr': args.learning_rate,
-            'batch_size': args.batch_size,
             'epochs': args.epochs,
             'lr_decay_epoch': args.step_size,
             'optimizer': args.optimizer,
@@ -153,11 +155,9 @@ def main():
     print("Loading training set and testing set..."),
     train_set = getattr(datasets, options['data']['dataset'])(data_opts, 'train',
                                 dataset_option=options['data'].get('dataset_option', None),
-                                batch_size=options['data']['batch_size'],
-                                use_region=options['data'].get('use_region', False))
+                                use_region=options['data'].get('use_region', False),)
     test_set = getattr(datasets, options['data']['dataset'])(data_opts, 'test',
                                 dataset_option=options['data'].get('dataset_option', None),
-                                batch_size=options['data']['batch_size'],
                                 use_region=options['data'].get('use_region', False))
     print("Done")
 
@@ -172,8 +172,9 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=options['data']['batch_size'],
                                                 shuffle=True, num_workers=args.workers,
                                                 pin_memory=True,
-                                                collate_fn=getattr(datasets, options['data']['dataset']).collate)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=options['data']['batch_size'],
+                                                collate_fn=getattr(datasets, options['data']['dataset']).collate, 
+                                                drop_last=True,)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=1,
                                                 shuffle=False, num_workers=args.workers,
                                                 pin_memory=True,
                                                 collate_fn=getattr(datasets, options['data']['dataset']).collate)
@@ -248,6 +249,7 @@ def main():
                     step_size=options['optim']['lr_decay_epoch'],
                     gamma=options['optim']['lr_decay'])
     # Setting the state of the training model
+    model = DataParallel(model)
     model.cuda()
     model.train()
 
@@ -271,7 +273,7 @@ def main():
     top_Ns = [50, 100]
 
     if args.evaluate:
-        recall, result = model.engines.test(test_loader, model, top_Ns,
+        recall, result = model.module.engines.test(test_loader, model, top_Ns,
                                             nms=args.nms,
                                             triplet_nms=args.triplet_nms,
                                             use_gt_boxes=args.use_gt_boxes)
@@ -286,6 +288,14 @@ def main():
                     float(recall[0][idx]) * 100))
         print('============ Done ============')
         save_results(result, None, options['logs']['dir_logs'], is_testing=True)
+        return
+
+    if args.evaluate_object:
+        result = model.module.engines.test_object_detection(test_loader, model, nms=args.nms, use_gt_boxes=args.use_gt_boxes)
+        print('============ Done ============')
+        path_dets = save_detections(result, None, options['logs']['dir_logs'], is_testing=True)
+        print('Evaluating...')
+        python_eval(path_dets, osp.join(data_opts['dir'], 'object_xml'))
         return
 
     print '========== [Start Training] ==========\n'
@@ -319,11 +329,11 @@ def main():
             scheduler.step()
             print('[Learning Rate]\t{}'.format(optimizer.param_groups[0]['lr']))
             is_best=False
-            model.engines.train(train_loader, model, optimizer, exp_logger, epoch, args.train_all, args.print_freq,
+            model.module.engines.train(train_loader, model, optimizer, exp_logger, epoch, args.train_all, args.print_freq,
                 clip_gradient=options['optim']['clip_gradient'], iter_size=args.iter_size)
             if (epoch + 1) % args.eval_epochs == 0:
                 print('\n============ Epoch {} ============'.format(epoch))
-                recall, result = model.engines.test(test_loader, model, top_Ns,
+                recall, result = model.module.engines.test(test_loader, model, top_Ns,
                                                                     nms=args.nms,
                                                                     triplet_nms=args.triplet_nms)
                 # save_results(result, epoch, options['logs']['dir_logs'], is_testing=False)
@@ -347,7 +357,7 @@ def main():
                         'exp_logger': exp_logger,
                         'best_recall': best_recall[0],
                     },
-                    model, #model.module.state_dict(),
+                    model.module, #model.module.state_dict(),
                     optimizer.state_dict(),
                     options['logs']['dir_logs'],
                     args.save_all_from,

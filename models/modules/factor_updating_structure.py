@@ -18,7 +18,7 @@ class Kernel_Attention_Module(nn.Module):
 
 	def forward(self, source_feat, target_feat, return_gate_value=False):
 		# print '[unary_term, pair_term]', [unary_term, pair_term]
-		gate = F.sigmoid(torch.mean((self.ws(source_feat) * self.wt(target_feat)), 1, keepdim=True))
+		gate = torch.sigmoid(torch.mean((self.ws(source_feat) * self.wt(target_feat)), 1, keepdim=True))
 		# print 'gate', gate
 		output = source_feat * gate.expand(gate.size(0), source_feat.size(1))
 		if return_gate_value:
@@ -38,7 +38,7 @@ class Attention_Module(nn.Module):
 		if self.filter_size > 0:
 			gate = torch.cat([source_feat, target_feat], 1)
 			gate = F.relu(gate)
-			gate = torch.mean(F.sigmoid(self.w(gate)), 1, keepdim=True)
+			gate = torch.mean(torch.sigmoid(self.w(gate)), 1, keepdim=True)
 			# print 'gate', gate
 			output = source_feat * gate.expand_as(source_feat)
 			if return_gate_value:

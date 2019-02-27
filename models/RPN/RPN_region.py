@@ -14,7 +14,6 @@ from lib.fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
 
 from lib import network
 from lib.network import Conv2d, FC
-from lib.roi_pooling.modules.roi_pool import RoIPool
 import torchvision.models as models
 import torch.utils.model_zoo as model_zoo
 import math

@@ -38,7 +38,7 @@ class Dumplicate_Removal(nn.Module):
     feature_visual = feature_rank + feature_obj
     feature_visual = self.relation_transform(feature_visual, rois_obj)
     reranked_score = self.transform_rescore(F.relu(feature_visual, inplace=True)) 
-    reranked_score = F.sigmoid(reranked_score)
+    reranked_score = torch.sigmoid(reranked_score)
 
     return reranked_score
 

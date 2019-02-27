@@ -10,10 +10,12 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Update the Model link for VG-DR-Net (We will upload a new model by Aug. 27). 
 - [x] Update the Dataset link for VG-DR-Net. 
 - [ ] A demonstration of our Factorizable Net 
-- [ ] Migrate to PyTorch 0.4.x (currently, 0.3.x).
+- [x] Migrate to PyTorch 1.0.1
+- [x] Multi-GPU support (beta version): one image per GPU
 
 ## Updates
-- Aug 28: Bug fix for running the evaluation with "--use_gt_boxes". VG-DR-Net has some self-relations, e.g. A-relation-A. Previously, we assumed there is no such relation. This commit may influence the model performance on Scene Graph Generation. 
+- Feb 26, 2019: Now we release our beta [Multi-GPU] version of Factorizable Net. 
+- Aug 28, 2018: Bug fix for running the evaluation with "--use_gt_boxes". VG-DR-Net has some self-relations, e.g. A-relation-A. Previously, we assumed there is no such relation. This commit may influence the model performance on Scene Graph Generation. 
 
 ## Project Settings
 
@@ -34,7 +36,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 3. Build the Cython modules for nms, roi pooling,roi align modules
     ```bash
     cd lib
-    ./make.sh
+    make all
     cd ..
     ```
 5. Download the three datasets [**VG-MSDN**](https://drive.google.com/open?id=1WjetLwwH3CptxACrXnc1NCcccWUVDO76), [**VG-DR-Net**](https://drive.google.com/open?id=1JZecHzzwGj1hxnn77hPOlOvqpjavebcD), [**VRD**](https://drive.google.com/open?id=12oLtVSCEusG7tG4QwxeJEDsVhiE9gb2s) to ```F-Net/data```. And extract the folders with ```tar xzvf ${Dataset}.tgz```. We have converted the original annotations to ```json``` version. 

@@ -23,7 +23,7 @@ class VRD(data.Dataset):
         super(VRD, self).__init__()
         self._name = image_set
         self.opts = opts
-        self._batch_size = batch_size
+        # self._batch_size = batch_size
         self._image_set = image_set
         self._data_path = osp.join(self.opts['dir'], 'images', 'sg_{}_images'.format(image_set))
         # load category names and annotations
@@ -72,11 +72,11 @@ class VRD(data.Dataset):
         if self.transform is not None:
             item['visual']  = self.transform(item['visual'])
 
-        if self._batch_size > 1:
-            # padding the image to MAX_SIZE, so all images can be stacked
-            pad_h = self.opts[self.cfg_key]['MAX_SIZE'] - item['visual'].size(1)
-            pad_w = self.opts[self.cfg_key]['MAX_SIZE'] - item['visual'].size(2)
-            item['visual'] = F.pad(item['visual'], (0, pad_w, 0, pad_h)).data
+        # if self._batch_size > 1:
+        #     # padding the image to MAX_SIZE, so all images can be stacked
+        #     pad_h = self.opts[self.cfg_key]['MAX_SIZE'] - item['visual'].size(1)
+        #     pad_w = self.opts[self.cfg_key]['MAX_SIZE'] - item['visual'].size(2)
+        #     item['visual'] = F.pad(item['visual'], (0, pad_w, 0, pad_h)).data
 
         _annotation = self.annotations[index]
         gt_boxes_object = np.zeros((len(_annotation['objects']), 5))
@@ -101,19 +101,18 @@ class VRD(data.Dataset):
         batch_item = {}
         for key in items[0]:
             if key == 'visual':
-                out = None
-                # If we're in a background process, concatenate directly into a
-                # shared memory tensor to avoid an extra copy
-                numel = sum([x[key].numel() for x in items])
-                storage = items[0][key].storage()._new_shared(numel)
-                out = items[0][key].new(storage)
-                batch_item[key] = torch.stack([x[key] for x in items], 0, out=out)
+                batch_item[key] = [x[key].unsqueeze(0) for x in items]
+            #     out = None
+            #     # If we're in a background process, concatenate directly into a
+            #     # shared memory tensor to avoid an extra copy
+            #     numel = sum([x[key].numel() for x in items])
+            #     storage = items[0][key].storage()._new_shared(numel)
+            #     out = items[0][key].new(storage)
+            #     batch_item[key] = torch.stack([x[key] for x in items], 0, out=out)
             elif key == 'rpn_targets':
                 batch_item[key] = {}
                 for subkey in items[0][key]:
-                    batch_item[key][subkey] = [
-                        np.array([x[key][subkey][r_id] for x in items], dtype=np.float) #labels, targets, inside_weights, outside_weights
-                        for r_id in range(len(items[0][key][subkey]))]
+                    batch_item[key][subkey] = [x[key][subkey] for x in items]
             elif items[0][key] is not None:
                 batch_item[key] = [x[key] for x in items]
 

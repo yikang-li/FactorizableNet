@@ -5,8 +5,9 @@
 # Written by Ross Girshick
 # --------------------------------------------------------
 
-from lib.nms.nms_gpu import nms_gpu
+from lib.layer_utils.roi_layers import nms as nms_gpu
 from lib.nms.nms_retain_all import nms_retain_all
+import torch
 # from ..nms import cpu_nms
 # from ..nms import gpu_nms
 
@@ -21,4 +22,5 @@ def nms(dets, thresh, retain_all=False):
     if retain_all:
     	return nms_retain_all(dets, thresh)
     else:
-    	return nms_gpu(dets, thresh)
+        dets = torch.Tensor(dets).cuda()
+    	return nms_gpu(dets[:, :4], dets[:, 4], thresh).cpu().numpy()

@@ -4,7 +4,6 @@ import os.path as osp
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 from lib.utils.timer import Timer
 from lib.utils.blob import im_list_to_blob
@@ -14,7 +13,6 @@ from lib.fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
 
 from lib import network
 from lib.network import Conv2d, FC
-from lib.roi_pooling.modules.roi_pool import RoIPool
 import torchvision.models as models
 import math
 import json
@@ -87,9 +85,9 @@ class RPN(nn.Module):
         normal_fun(self.bbox_conv, 0.01)
 
 
-    @property
-    def loss(self):
-        return self.loss_cls + self.loss_box * 0.2
+    # @property
+    # def loss(self):
+    #     return self.loss_cls + self.loss_box * 0.2
 
     def forward(self, im_data, im_info, gt_objects=None, dontcare_areas=None, rpn_data=None):
 
@@ -117,11 +115,21 @@ class RPN(nn.Module):
                                    mappings=self.opts['mappings'])
 
         # generating training labels and build the rpn loss
+        losses = {}
         if self.training and rpn_data is not None:
-            self.loss_cls, self.loss_box, accs = build_loss(rpn_cls_score_reshape, rpn_bbox_pred, rpn_data)
-            self.tp, self.tf, self.fg_cnt, self.bg_cnt = accs
+            loss_cls, loss_box, accs = build_loss(rpn_cls_score_reshape, rpn_bbox_pred, rpn_data)
+            tp, tf, fg_cnt, bg_cnt = accs
+            losses = {
+                'loss_cls': loss_cls,
+                'loss_box': loss_box,
+                'loss': loss_cls + loss_box * 0.2,
+                'tp': tp,
+                'tf': tf,
+                'fg_cnt': fg_cnt,
+                'bg_cnt': bg_cnt,
 
-        return features, rois
+            }
+        return features, rois, losses
 
 
     @staticmethod

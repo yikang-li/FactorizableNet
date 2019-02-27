@@ -9,12 +9,16 @@ import torchvision.models as models
 import os.path as osp
 import yaml
 from .factorizable_network_v4 import Factorizable_network as FN_v4
-from models.modules import factor_updating_structure_v3r as factor_updating_structure
+from models.modules.factor_updating_structure_v3r import factor_updating_structure
 import torch.nn as nn
 from lib.network import GroupDropout
 import lib.network as network
 import torch.nn.functional as F
 from .utils import nms_detections, build_loss_bbox, build_loss_cls, interpret_relationships, interpret_objects
+
+
+from lib.utils.timer import Timer
+
 
 DEBUG = False
 TIME_IT = False
@@ -31,11 +35,14 @@ class Factorizable_network(FN_v4):
         network.weights_normal_init(self.mps_list, 0.01)
 
     def forward(self, im_data, im_info, gt_objects=None, gt_relationships=None, rpn_anchor_targets_obj=None):
-
+        # timing the process
+        base_timer = Timer()
+        mps_timer = Timer()
+        infer_timer = Timer()
         assert im_data.size(0) == 1, "Only support Batch Size equals 1"
-        self.base_timer.tic()
+        base_timer.tic()
         # Currently, RPN support batch but not for MSDN
-        features, object_rois = self.rpn(im_data, im_info, rpn_data=rpn_anchor_targets_obj)
+        features, object_rois, rpn_losses = self.rpn(im_data, im_info, rpn_data=rpn_anchor_targets_obj)
         if self.training:
             roi_data_object, roi_data_predicate, roi_data_region, mat_object, mat_phrase, mat_region = \
                 self.proposal_target_layer(object_rois, gt_objects[0], gt_relationships[0], self.n_classes_obj)
@@ -52,18 +59,18 @@ class Factorizable_network(FN_v4):
         pooled_region_features = self.fc_region(pooled_region_features)
 
         bbox_object = self.bbox_obj(F.relu(pooled_object_features))
-        self.base_timer.toc()
+        base_timer.toc()
 
-        self.mps_timer.tic()
-
+        mps_timer.tic()
         for i, mps in enumerate(self.mps_list):
             pooled_object_features, pooled_region_features = \
                 mps(pooled_object_features, pooled_region_features, mat_object, mat_region, object_rois, region_rois)
 
-        self.mps_timer.toc()
-        self.infer_timer.tic()
+        mps_timer.toc()
+
+        infer_timer.tic()
         pooled_phrase_features = self.phrase_inference(pooled_object_features, pooled_region_features, mat_phrase)
-        self.infer_timer.toc()
+        infer_timer.toc()
 
         cls_score_object = self.score_obj(F.relu(pooled_object_features))
         cls_prob_object = F.softmax(cls_score_object, dim=1)
@@ -72,26 +79,41 @@ class Factorizable_network(FN_v4):
 
         if TIME_IT:
             print('TIMING:')
-            print('[CNN]:\t{0:.3f} s'.format(self.base_timer.average_time))
-            print('[MPS]:\t{0:.3f} s'.format(self.mps_timer.average_time))
-            print('[INF]:\t{0:.3f} s'.format(self.infer_timer.average_time))
+            print('[CNN]:\t{0:.3f} s'.format(base_timer.average_time))
+            print('[MPS]:\t{0:.3f} s'.format(mps_timer.average_time))
+            print('[INF]:\t{0:.3f} s'.format(infer_timer.average_time))
 
 
         # object cls loss
-        self.loss_cls_obj, (self.tp, self.tf, self.fg_cnt, self.bg_cnt) = \
-                build_loss_cls(cls_score_object, roi_data_object[0], self.object_loss_weight)
+        loss_cls_obj, (tp, tf, fg_cnt, bg_cnt) = \
+                build_loss_cls(cls_score_object, roi_data_object[0], 
+                    loss_weight=self.object_loss_weight.to(cls_score_object.get_device()))
         # object regression loss
-        self.loss_reg_obj= build_loss_bbox(bbox_object, roi_data_object, self.fg_cnt)
+        loss_reg_obj= build_loss_bbox(bbox_object, roi_data_object, fg_cnt)
         # predicate cls loss
-        self.loss_cls_rel,  (self.tp_pred, self.tf_pred, self.fg_cnt_pred, self.bg_cnt_pred)= \
-                build_loss_cls(cls_score_predicate, roi_data_predicate[0], self.predicate_loss_weight)
-
+        loss_cls_rel,  (tp_pred, tf_pred, fg_cnt_pred, bg_cnt_pred)= \
+                build_loss_cls(cls_score_predicate, roi_data_predicate[0], 
+                    loss_weight=self.predicate_loss_weight.to(cls_score_predicate.get_device()))
+        losses = {
+            'rpn': rpn_losses,
+            'loss_cls_obj': loss_cls_obj, 
+            'loss_reg_obj': torch.zeros_like(loss_reg_obj) if torch.isnan(loss_reg_obj) else loss_reg_obj,
+            'loss_cls_rel': loss_cls_rel,
+            'tf': tf,
+            'tp': tp,
+            'fg_cnt': fg_cnt,
+            'bg_cnt': bg_cnt,
+            'tp_pred': tp_pred,
+            'tf_pred': tf_pred,
+            'fg_cnt_pred': fg_cnt_pred,
+            'bg_cnt_pred': bg_cnt_pred,
+        }
         # loss for NMS
         if self.learnable_nms:
             duplicate_labels = roi_data_object[4][:, 1:2]
             duplicate_weights = roi_data_object[4][:, 0:1]
             if duplicate_weights.data.sum() == 0:
-                self.loss_nms = self.loss_cls_rel * 0 # Guarentee the data type
+                loss_nms = loss_cls_rel * 0 # Guarentee the data type
             else:
                 mask = torch.zeros_like(cls_prob_object).byte()
                 for i in range(duplicate_labels.size(0)):
@@ -99,20 +121,18 @@ class Factorizable_network(FN_v4):
                 selected_prob = torch.masked_select(cls_prob_object, mask)
                 reranked_score = self.nms(pooled_object_features, selected_prob, roi_data_object[1])
                 selected_prob = selected_prob.unsqueeze(1) * reranked_score
-                self.loss_nms = F.binary_cross_entropy(selected_prob, duplicate_labels,
+                loss_nms = F.binary_cross_entropy(selected_prob, duplicate_labels,
                                     weight=duplicate_weights,
                                     size_average=False) / (duplicate_weights.data.sum() + 1e-10)
+            losses["loss_nms"] = loss_nms
 
+        losses['loss'] = self.loss(losses)
 
-
-
-        return (cls_prob_object, bbox_object, object_rois), \
-                (cls_prob_predicate, mat_phrase),
+        return losses
 
     def forward_eval(self, im_data, im_info, gt_objects=None):
-
         # Currently, RPN support batch but not for MSDN
-        features, object_rois = self.rpn(im_data, im_info)
+        features, object_rois, _ = self.rpn(im_data, im_info)
         if gt_objects is not None:
             gt_rois = np.concatenate([np.zeros((gt_objects.shape[0], 1)),
                                       gt_objects[:, :4],

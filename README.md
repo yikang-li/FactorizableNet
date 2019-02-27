@@ -14,7 +14,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
 - [x] Multi-GPU support (beta version): one image per GPU
 
 ## Updates
-- Feb 26, 2019: Now we release our beta [Multi-GPU] version of Factorizable Net. 
+- Feb 26, 2019: Now we release our beta [Multi-GPU] version of Factorizable Net. Find the stable version at branch [0.3.1](https://github.com/yikang-li/FactorizableNet/tree/0.3.1)
 - Aug 28, 2018: Bug fix for running the evaluation with "--use_gt_boxes". VG-DR-Net has some self-relations, e.g. A-relation-A. Previously, we assumed there is no such relation. This commit may influence the model performance on Scene Graph Generation. 
 
 ## Project Settings

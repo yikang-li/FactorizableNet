@@ -52,7 +52,7 @@ def train(loader, model, optimizer, exp_logger, epoch, train_all, print_freq=100
                 return losses 
             losses = merge_losses(raw_losses)
             if train_all:
-                loss = losses['loss'] + losses['rpn_losses']['loss'] * 0.5
+                loss = losses['loss'] + losses['rpn']['loss'] * 0.5
             else:
                 loss = losses['loss']
             # to logging the loss and itermediate values

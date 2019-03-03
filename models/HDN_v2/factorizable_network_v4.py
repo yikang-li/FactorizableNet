@@ -194,7 +194,7 @@ class Factorizable_network(nn.Module):
         losses = {
             'rpn': rpn_losses,
             'loss_cls_obj': loss_cls_obj, 
-            'loss_reg_obj': loss_reg_obj,
+            'loss_reg_obj': torch.zeros_like(loss_reg_obj) if torch.isnan(loss_reg_obj) else loss_reg_obj,
             'loss_cls_rel': loss_cls_rel,
             'tf': tf,
             'tp': tp,

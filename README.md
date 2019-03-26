@@ -24,7 +24,7 @@ This is pytorch implementation of our ECCV-2018 paper: [**Factorizable Net: An E
     ```
     conda install pip pyyaml sympy h5py cython numpy scipy click
     conda install -c menpo opencv3
-    conda install -c soumith pytorch torchvision cuda80 
+    conda install pytorch torchvision cudatoolkit=8.0 -c pytorch 
     pip install easydict
     ```
 
